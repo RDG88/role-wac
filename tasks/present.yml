@@ -1,0 +1,40 @@
+---
+
+- name: Download Installer
+  win_get_url:
+    url: "{{ wac_download_url }}"
+    dest: "{{ wac_download_path }}"
+    follow_redirects: all
+
+- name: Set Appropriate Facts
+  set_fact:
+    wac_args_extra: "{{ (wac_ssl_certificate_option == 'installed') | ternary(' SME_THUMBPRINT=' + wac_sme_thumbprint,' ') }}"
+
+- name: Debug WAC Args
+  debug:
+    msg: "ARGS: {{ wac_args }}{{ wac_args_extra | default('') }}"
+
+- name: Install WAC with Selected Options
+  win_package:
+    creates_path: "{{ wac_local_install_path }}"
+    creates_service: Windows Admin Center
+    expected_return_code: 0,3010
+    arguments: "{{ wac_args }}{{ wac_args_extra | default('') }}"
+    path: "{{ wac_download_path }}"
+    log_path: "{{ wac_log_path | default(omit) }}"
+  register: wac_install
+
+- name: Restart Server
+  win_reboot:
+    msg: Rebooting to Complete Windows Admin Center Installation
+  when: wac_install is changed
+
+- name: Delete Installer
+  win_file:
+    path: "{{ wac_download_path }}"
+    state: absent
+  when: wac_cleanup_installer
+
+- name: Enable Constrained Delegation
+  import_tasks: delegation.yml
+  when: wac_constrained_delegation_enabled

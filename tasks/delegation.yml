@@ -1,0 +1,7 @@
+---
+- name: Enable Constrained Delegation
+  win_shell: >
+    Set-ADComputer -Identity (Get-ADComputer {{ item }})
+    -PrincipalsAllowedToDelegateToAccount (Get-ADComputer {{ wac_server_hostname }})
+  delegate_to: "{{ wac_constrained_delegation_ad_server }}"
+  loop: "{{ wac_constrained_delegation_list }}"

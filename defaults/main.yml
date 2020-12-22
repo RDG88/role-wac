@@ -1,0 +1,16 @@
+---
+wac_cleanup_installer: false
+wac_download_url: https://aka.ms/WACDownload
+wac_download_path: C:\\Windows\\Temp\\wac.msi
+wac_log_path: C:\Windows\Temp\wac-{{lookup('pipe', 'date +%Y%m%dT%H%M%S')}}.log
+wac_local_install_path: C:\\Program Files\\Windows Admin Center\\
+wac_server_hostname: "{{ inventory_hostname }}"
+wac_constrained_delegation_enabled: false
+wac_constrained_delegation_ad_server: ""
+wac_constrained_delegation_list: []
+wac_ssl_certificate_option: generate
+wac_sme_thumbprint: ""
+wac_sme_port: 8443
+wac_state: present
+wac_product_id: '{65E83844-8B8A-42ED-B78D-BA021BE4AE83}'
+wac_args: RESTART_WINRM=0 SME_PORT={{ wac_sme_port }} SSL_CERTIFICATE_OPTION={{ wac_ssl_certificate_option }}
